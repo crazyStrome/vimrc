@@ -3,20 +3,23 @@
 
 "设置 vimrc 修改保存后立刻生效，不用在重新打开
 " 建议配置完成后将这个关闭
-autocmd BufWritePost $MYVIMRC source $MYVIMRC
+" autocmd BufWritePost $MYVIMRC source $MYVIMRC
 
 " 关闭兼容模式
 set nocompatible
 
 set nu " 设置行号
 set cursorline "突出显示当前行
-" set cursorcolumn " 突出显示当前列
+set cursorcolumn " 突出显示当前列
 set showmatch " 显示括号匹配
 
 " tab 缩进
 set tabstop=4 " 设置Tab长度为4空格
 set shiftwidth=4 " 设置自动缩进长度为4空格
 set autoindent " 继承前一行的缩进方式，适用于多行注释
+
+" 设置标签页
+set showtabline=2
 
 "显示光标当前位置
 set ruler 
@@ -38,11 +41,7 @@ let g:indent_guides_start_level=2
 " 色块宽度
 let g:indent_guides_guide_size=1
 " 快捷键 i 开/关缩进可视化
-:nmap <silent> <Leader>i <Plug>IndentGuidesToggle
-
-nnoremap <leader>jc :YcmCompleter GoToDeclaration<CR>
-" 只能是 #include 或已打开的文件
-nnoremap <leader>jd :YcmCompleter GoToDefinition<CR>
+nmap <silent> <Leader>i <Plug>IndentGuidesToggle
 
 
 " 定义快捷键的前缀，即<Leader>
@@ -57,8 +56,8 @@ let mapleader="\<space>"
 "nmap <Leader>v "+p
 " ============wsl下vim和系统共享剪贴板
 map <Leader>c : !/mnt/c/Windows/System32/clip.exe<cr>u
-map <Leader>p :read !/mnt/c/Windows/System32/paste.exe <cr>i<bs><esc>l
-map! <Leader>p <esc>:read !/mnt/c/Windows/System32/paste.exe <cr>i<bs><esc>l
+map <Leader>v :read !/mnt/c/Windows/System32/paste.exe <cr>i<bs><esc>l
+map! <Leader>v <esc>:read !/mnt/c/Windows/System32/paste.exe <cr>i<bs><esc>l
 "
 "开启实时搜索
 set incsearch
@@ -71,7 +70,7 @@ filetype plugin indent on    " 启用自动补全
 set backspace=2 "解决插入模式下无法删除问题
 
 " 退出插入模式指定类型的文件自动保存
-au InsertLeave *.go,*.sh,*.php write
+" au InsertLeave *.go,*.sh,*.php write
 
 " 插件开始的位置
 call plug#begin('~/.vim/plugged')
@@ -79,6 +78,11 @@ call plug#begin('~/.vim/plugged')
 " Shorthand notation; fetches https://github.com/junegunn/vim-easy-align
 " 可以快速对齐的插件
 Plug 'junegunn/vim-easy-align'
+"开屏美化
+Plug 'mhinz/vim-startify'
+
+" 代码对齐线
+Plug 'nathanaelkane/vim-indent-guides'
 
 " 用来提供一个导航目录的侧边栏
 Plug 'scrooloose/nerdtree'
@@ -103,8 +107,9 @@ Plug 'vim-airline/vim-airline'
 " 有道词典在线翻译
 Plug 'ianva/vim-youdao-translater'
 
-" 代码自动完成，安装完插件还需要额外配置才可以使用
-Plug 'Valloric/YouCompleteMe'
+" 新代码补全插件
+" Use release branch (recommend)
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 " 可以在文档中显示 git 信息
 Plug 'airblade/vim-gitgutter'
@@ -131,10 +136,14 @@ Plug 'acarapetis/vim-colors-github'
 Plug 'rakr/vim-one'
 
 " go 主要插件
-Plug 'fatih/vim-go', { 'tag': '*' }
+" Plug 'fatih/vim-go', { 'tag': '*' }
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 " go 中的代码追踪，输入 gd 就可以自动跳转
 Plug 'dgryski/vim-godef'
-
+" 代码注释反注释
+Plug 'preservim/nerdcommenter' 
+" 彩虹括号
+Plug 'luochen1990/rainbow'
 " markdown 插件
 Plug 'iamcco/mathjax-support-for-mkdp'
 Plug 'iamcco/markdown-preview.vim'
@@ -151,6 +160,10 @@ set termguicolors
 " 配色方案, 可以从上面插件安装中的选择一个使用 
 colorscheme one " 主题
 set background=dark " 主题背景 dark-深色; light-浅色
+" 有道翻译插件
+vnoremap <silent> <C-T> :<C-u>Ydv<CR>
+nnoremap <silent> <C-T> :<C-u>Ydc<CR>
+noremap <leader>yd :<C-u>Yde<CR>
 
 "==============================================================================
 " vim-go 插件
@@ -158,6 +171,7 @@ set background=dark " 主题背景 dark-深色; light-浅色
 let g:go_fmt_command = "goimports" " 格式化将默认的 gofmt 替换
 let g:go_autodetect_gopath = 1
 let g:go_list_type = "quickfix"
+let g:go_autodetect_gopath = 1
 
 let g:go_version_warning = 1
 let g:go_highlight_types = 1
@@ -211,9 +225,12 @@ map <F9> :NERDTreeToggle<CR>
 " 显示行号
 let NERDTreeShowLineNumbers=1
 " 打开文件时是否显示目录
-let NERDTreeAutoCenter=1
+let NERDTreeAutoCenter=0
+" 关闭vim时，如果打开的文件除了NERDTree没有其他文件时，它自动关闭，减少多次按:q!
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
 " 是否显示隐藏文件
-let NERDTreeShowHidden=0
+let NERDTreeShowHidden=1
 " 设置宽度
 " let NERDTreeWinSize=31
 " 忽略一下文件的显示
@@ -279,48 +296,6 @@ let g:NERDTreeGitStatusIndicatorMapCustom = {
 
 let g:NERDTreeGitStatusShowIgnored= 1
 
-" ======================================================================================
-" ycmd配置
-" ==========================================================================
-" let g:ycm_server_python_interpreter='/usr/bin/python'
-" let g:ycm_global_ycm_extra_conf='~/.vim/.ycm_extra_conf.py'
-"YoucomPleteMe:语句补全插件"
-set runtimepath+=~/.vim/plugged/YouCompleteMe
-let g:ycm_server_python_interpreter='/usr/bin/python'    "python版本在3以上
-let g:ycm_global_ycm_extra_conf='~/.vim/.ycm_extra_conf.py' "加载文件路径
-"let g:ycm_clangd_binary_path = "~/ycm_temp/llvm_root_dir/bin/clangd"
-let g:clang_library_path='/usr/lib/llvm-10/lib/libclang.so'  "libclang路径
-
-autocmd InsertLeave * if pumvisible() == 0|pclose|endif     " 离开插入模式后自动关闭预览窗口"
-let g:ycm_collect_identifiers_from_tags_files = 1           " 开启YCM基于标签引擎
-let g:ycm_collect_identifiers_from_comments_and_strings = 1 " 注释与字符串中的内容也用于补全
-let g:syntastic_ignore_files=[".*\.py$"]
-let g:ycm_seed_identifiers_with_syntax = 1                  " 语法关键字补全
-let g:ycm_complete_in_strings = 1
-let g:ycm_confirm_extra_conf = 0                            " 关闭加载.ycm_extra_conf.py提示
-let g:ycm_key_list_select_completion = ['<c-n>', '<Down>']  " 映射按键,没有这个会拦截掉tab, 导致其他插件的tab不能用.
-let g:ycm_key_list_previous_completion = ['<c-p>', '<Up>']
-let g:ycm_key_invoke_completion = '<C-a>'  
-let g:ycm_complete_in_comments = 1                          " 在注释输入中也能补全
-let g:ycm_complete_in_strings = 1                           " 在字符串输入中也能补全
-let g:ycm_collect_identifiers_from_comments_and_strings = 1 " 注释和字符串中的文字也会被收入补全
-"let g:ycm_global_ycm_extra_conf='~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
-let g:ycm_show_diagnostics_ui = 0                           " 禁用语法检查
-let g:ycm_semantic_triggers = {							
-					\'c,cpp,python,java,go,perl':['re!\w{2}'],
-					\'cs,lua,javascript':['re!\w{2}'],
-					\}
-
-inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"             
-nnoremap <c-j> :YcmCompleter GoToDefinitionElseDeclaration<CR>   
-let g:ycm_min_num_of_chars_for_completion = 2                 " 从第2个键入字符就开始罗列匹配项
-let g:ycm_max_num_candidates = 15							  " 候选数量设置
-let g:ycm_auto_trigger = 1
-" better key bindings for UltiSnipsExpandTrigger
-let g:UltiSnipsExpandTrigger = "<tab>"
-let g:UltiSnipsJumpForwardTrigger = "<tab>"
-let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
-
 "==============================================================================
 "  其他插件配置
 "==============================================================================
@@ -342,10 +317,10 @@ map <silent> <F6> <Plug>StopMarkdownPreview
 :nn <Leader>0 :tablast<CR>
 
 " 切换窗口
-nmap <leader>l <C+w>l
-nmap <leader>k <C+w>k
-nmap <leader>h <C+w>h
-nmap <leader>j <C+w>j
+nmap <leader>l <C-w>l
+nmap <leader>k <C-w>k
+nmap <leader>h <C-w>h
+nmap <leader>j <C-w>j
 
 " 快捷键到行首和行尾
 nmap <Leader>b 0
@@ -355,10 +330,71 @@ nmap <Leader>e $
 nmap <Leader>w :w<CR>
 
 "go函数追踪
-autocmd FileType go nnoremap <buffer> gd :call GodefUnderCursor()<cr>
+"autocmd FileType go nnoremap <buffer> gd :call GodefUnderCursor()<cr>
 autocmd FileType go nnoremap <buffer> <Leader>] :call GodefUnderCursor()<cr>
 let g:godef_split=2  "打开新tab
 let g:godef_same_file_in_same_window=1
 "函数在同一个文件中时不需要打开新窗口
-"跳转回去
-map <Leader>[ <C+o>
+
+"代码对齐线设置
+let g:indent_guides_guide_size=1
+let g:indent_guides_enable_on_vim_startup = 1
+hi IndentGuidesOdd  ctermbg=white
+hi IndentGuidesEven ctermbg=lightgrey
+
+" ========================================coc配置========================================
+
+" TextEdit might fail if hidden is not set.
+set hidden
+"Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
+" delays and poor user experience.set updatetime=300
+" or user experience.
+set updatetime=100
+
+
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+" Use <c-space> to trigger completion.
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
+" Use `[g` and `]g` to navigate diagnostics
+" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
+nmap <silent> <Leader>- <Plug>(coc-diagnostic-prev)
+nmap <silent> <Leader>= <Plug>(coc-diagnostic-next)
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+
+" Use K to show documentation in preview window.
+nnoremap <silent> <Leader>h :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  elseif (coc#rpc#ready())
+    call CocActionAsync('doHover')
+  else
+    execute '!' . &keywordprg . " " . expand('<cword>')
+  endif
+endfunction
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+"coc-go配置
+" Add missing imports on save
+autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
+
