@@ -1,4 +1,7 @@
 # vimrc
+
+具体的软件安装以及配置可以参考我的[DockerFile](https://github.com/crazyStrome/vimrc/blob/master/Dockerfile)
+
 vim配置，使用vim-plug管理,配置golang开发环境，包括文件树，tag树，跳转，补全。
 
 repo中的init.vim-nvim用于neovim配置。
@@ -55,3 +58,15 @@ Ctrl+n在insert模式中选择下一个补全项，反向使用Ctrl+p
 剩下的看init.vim吧。
 
 有问题提issue，随时更
+
+## 已经配置好的docker镜像
+环境centos
+安装完docker，执行
+```bash
+docker pull crazystrome/centos:nvim
+```
+就把我的镜像拉下来了。
+
+我的DockerFile也放在这里[DockerFile](https://github.com/crazyStrome/vimrc/blob/master/Dockerfile)
+
+如果你们是其他的环境，也可以在此基础上修改。
