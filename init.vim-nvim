@@ -1,11 +1,17 @@
-" 关闭兼容模式
+" 关闭兼容模
 set nocompatible
-
+set encoding=utf-8
+set termencoding=utf-8
+set fileencoding=chinese
+set fencs=utf-8,gbk,gb2312,gb18030
 set nu " 设置行号
+set cursorcolumn
 set cursorline "突出显示当前行
 " set cursorcolumn " 突出显示当前列
 set showmatch " 显示括号匹配
 
+set number
+set laststatus=2
 " tab 缩进
 set tabstop=4 " 设置Tab长度为4空格
 set shiftwidth=4 " 设置自动缩进长度为4空格
@@ -37,6 +43,8 @@ au InsertLeave *.go,*.sh,*.php write
 call plug#begin('~/.vim/plugged')
 " Shorthand notation; fetches https://github.com/junegunn/vim-easy-align" 可以快速对齐的插件
 Plug 'junegunn/vim-easy-align'
+" go 单测生成
+Plug 'buoto/gotests-vim'
 
 " 用来提供一个导航目录的侧边栏
 Plug 'scrooloose/nerdtree'
@@ -57,6 +65,7 @@ Plug 'jiangmiao/auto-pairs'
 
 " Vim状态栏插件，包括显示行号，列号，文件类型，文件名，以及Git状态
 Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes' "airline 的主题"
 
 " 有道词典在线翻译
 Plug 'ianva/vim-youdao-translater'
@@ -73,17 +82,23 @@ Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 
 Plug 'preservim/nerdcommenter'
-
+Plug 'mhinz/vim-startify'
 " 配色方案
 " colorscheme neodark
 Plug 'KeitaNakamura/neodark.vim'
 " colorscheme monokai
 Plug 'crusoexia/vim-monokai'
 " colorscheme github
+Plug 'liuchengxu/space-vim-theme'
 Plug 'acarapetis/vim-colors-github'
+Plug 'yuttie/inkstained-vim'
 " colorscheme one
 Plug 'rakr/vim-one'
-
+Plug 'NLKNguyen/papercolor-theme'
+Plug 'connorholyday/vim-snazzy'
+Plug 'haystackandroid/snow'
+Plug 'itchyny/lightline.vim'
+Plug 'hzchirs/vim-material'
 " go 主要插件
 " Plug 'fatih/vim-go', { 'tag': '*' }
 " go 中的代码追踪，输入 gd 就可以自动跳转
@@ -109,6 +124,8 @@ set cmdheight=2
 
 " You will have bad experience for diagnostic messages when it's default 4000.
 set updatetime=300
+
+set autowriteall
 
 " don't give |ins-completion-menu| messages.
 set shortmess+=c
@@ -236,8 +253,8 @@ nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 " 开启24bit的颜色，开启这个颜色会更漂亮一些
 set termguicolors
 " 配色方案, 可以从上面插件安装中的选择一个使用
-colorscheme one " 主题
-set background=dark " 主题背景 dark-深色; light-浅色
+colorscheme papercolor" 主题
+set background=light" 主题背景 dark-深色; light-浅色
 
 
 "==============================================================================
@@ -269,18 +286,18 @@ map <F9> :NERDTreeToggle<CR>
 " 显示行号
 let NERDTreeShowLineNumbers=1
 " 打开文件时是否显示目录
-let NERDTreeAutoCenter=1
+let NERDTreeAutoCenter=0
 " 是否显示隐藏文件
-let NERDTreeShowHidden=0
+let NERDTreeShowHidden=1
 " 设置宽度
-" let NERDTreeWinSize=31
+let NERDTreeWinSize=31
 " 忽略一下文件的显示
 let NERDTreeIgnore=['\.pyc','\~$','\.swp']
 " 打开 vim 文件及显示书签列表
 let NERDTreeShowBookmarks=2
 
 " 在终端启动vim时，共享NERDTree
-let g:nerdtree_tabs_open_on_console_startup=1
+let g:nerdtree_tabs_open_on_console_startup=0
 
 
 "==============================================================================
@@ -357,6 +374,33 @@ map <silent> <F6> <Plug>StopMarkdownPreview
 :nn <Leader>8 8gt
 :nn <Leader>9 8gt
 :nn <Leader>0 :tablast<CR>
+:nn <Leader>] gT
+:nn <Leader>[ gt
 
-nmap <Leader>h <c-w>h
-nmap <Leader>l <c-w>l
+" 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位） 
+set mouse=a 
+
+set clipboard+=unnamedplus
+
+" airline 配置
+" 设置状态栏
+let g:airline_theme='papercolor'
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#left_alt_sep = '|'
+let g:airline#extensions#tabline#buffer_nr_show = 0
+let g:airline#extensions#tabline#formatter = 'default'
+"let g:airline_theme = 'one'  " 主题
+let g:airline#extensions#keymap#enabled = 1
+let g:airline#extensions#tabline#buffer_idx_mode = 1
+let g:airline#extensions#tabline#buffer_idx_format = {
+	\ '0': '0 ',
+    \ '1': '1 ',
+    \ '2': '2 ',
+    \ '3': '3 ',
+    \ '4': '4 ',
+    \ '5': '5 ',
+    \ '6': '6 ',
+    \ '7': '7 ',
+    \ '8': '8 ',
+    \ '9': '9 '
+ 
