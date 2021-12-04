@@ -41,7 +41,7 @@ curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs https://raw.githubuserc
 ```
 :PlugInstall
 :GoInstallBinaries
-:CocInstall coc-go coc-json coc-yaml coc-protobuf
+:CocInstall coc-go coc-json coc-yaml coc-protobuf coc-explorer coc-git
 ```
 到这里，nvim基本就可以用了。
 
