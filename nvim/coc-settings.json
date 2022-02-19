@@ -1,0 +1,24 @@
+{
+  "languageserver": {
+    "go": {
+      "command": "gopls",
+      "rootPatterns": ["go.mod"],
+      "trace.server": "verbose",
+      "filetypes": ["go"]
+    }
+  },
+  "coc.preferences.formatOnSaveFiletypes": [
+    "go"
+  ],
+  "explorer.icon.enableNerdfont": true,
+  "explorer.icon.source": "nerdfont.vim",
+  "go.goplsOptions": {
+    "completeUnimported": true
+  },
+  "go.goplsUseDaemon": true,
+  "hover.floatConfig": {
+      "border": true
+  },
+  "hover.target": "float"
+}
+

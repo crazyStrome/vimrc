@@ -3,14 +3,11 @@ if !exists('g:vscode')
 set nocompatible
 set encoding=utf-8
 set termencoding=utf-8
-set fileencoding=chinese
-set fencs=utf-8,gbk,gb2312,gb18030
+set fileencoding=utf-8
 set rnu " 设置行号
-"set cursorcolumn
 set cursorline "突出显示当前行
 " set cursorcolumn " 突出显示当前列
 set showmatch " 显示括号匹配
-
 set number
 set laststatus=2
 " tab 缩进
@@ -40,25 +37,23 @@ filetype plugin indent on    " 启用自动补全
 
 " 退出插入模式指定类型的文件自动保存
 au InsertLeave *.go,*.sh,*.php write
-
-
+autocmd FileType go set list lcs=tab:\¦\ "(last character is a space...)
+autocmd FileType go hi SpecialKey ctermfg=gray
 call plug#begin('~/.vim/plugged')
 " Shorthand notation; fetches https://github.com/junegunn/vim-easy-align" 可以快速对齐的插件
 "Plug 'junegunn/vim-easy-align'
 " go 单测生成
 Plug 'buoto/gotests-vim'
 Plug 'luochen1990/rainbow'
-Plug 'terryma/vim-smooth-scroll'
-" 显示 git 信息
-Plug 'zivyangll/git-blame.vim'
 Plug 'Yggdroot/indentLine'
+" 显示 git 信息
+"Plug 'zivyangll/git-blame.vim'
 Plug 'mhinz/vim-startify'
-
+Plug 'psliwka/vim-smoothie'
 " 自动补全括号的插件，包括小括号，中括号，以及花括号
 Plug 'jiangmiao/auto-pairs'
 Plug 'itchyny/vim-gitbranch'
 " Vim状态栏插件，包括显示行号，列号，文件类型，文件名，以及Git状态
-
 " 配色方案
 " colorscheme one
 Plug 'haystackandroid/cosmic_latte'
@@ -66,13 +61,14 @@ Plug 'rakr/vim-one'
 Plug 'itchyny/lightline.vim'
 " go 主要插件
 Plug 'fatih/vim-go', { 'tag': '*' }
-
+Plug 'lambdalisue/nerdfont.vim'
 Plug 'glepnir/zephyr-nvim'
 " markdown 插件
 Plug 'iamcco/mathjax-support-for-mkdp'
 Plug 'iamcco/markdown-preview.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'NLKNguyen/papercolor-theme'
+Plug 'kyazdani42/nvim-web-devicons' " for file icons
 " 悬浮终端
 Plug 'voldikss/vim-floaterm'
 Plug 'nvim-lua/plenary.nvim'
@@ -129,13 +125,18 @@ nnoremap <silent> K :call <SID>show_documentation()<CR>
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
+  elseif (coc#rpc#ready())
+    "call CocActionAsync('doHover')
+    call CocActionAsync('definitionHover')
   else
-    call CocAction('doHover')
+    execute '!' . &keywordprg . " " . expand('<cword>')
   endif
 endfunction
 
-" Highlight symbol under cursor on CursorHold
+" Highlight the symbol and its references when holding the cursor.
 autocmd CursorHold * silent call CocActionAsync('highlight')
+" Highlight symbol under cursor on CursorHold
+"autocmd CursorHold * silent call CocActionAsync('highlight')
 
 augroup mygroup
   autocmd!
@@ -144,6 +145,8 @@ augroup mygroup
   " Update signature help on jump placeholder
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
+
+autocmd BufWritePre *.go :call CocAction('runCommand', 'editor.action.organizeImport')
 
 " Use `:Format` to format current buffer
 command! -nargs=0 Format :call CocAction('format')
@@ -163,18 +166,18 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 "==============================================================================
 
 " 主题
-set background=light" 主题背景 dark-深色; light-浅色
+set background=dark" 主题背景 dark-深色; light-浅色
 
 
 " 开启24bit的颜色，开启这个颜色会更漂亮一些
 set termguicolors
 " 配色方案, 可以从上面插件安装中的选择一个使用
-colorscheme PaperColor
+colorscheme one
 
 "==============================================================================
 " vim-go 插件
 "==============================================================================
-let g:go_fmt_command = 'goimports' "格式化将默认的 gofmt 替换
+let g:go_fmt_command = 'gofmt' "格式化将默认的 gofmt 替换
 let g:go_autodetect_gopath = 1
 let g:go_list_type = 'quickfix'
 
@@ -197,25 +200,24 @@ let g:godef_split=2
 "==============================================================================
 
 " markdwon 的快捷键
-map <silent> <F1> <Plug>MarkdownPreview
-map <silent> <F2> <Plug>StopMarkdownPreview
+"map <silent> <F1> <Plug>MarkdownPreview
+"map <silent> <F2> <Plug>StopMarkdownPreview
 
 " tab 标签页切换快捷键
-:nn <Leader>1 1gt
-:nn <Leader>2 2gt
-:nn <Leader>3 3gt
-:nn <Leader>4 4gt
-:nn <Leader>5 5gt
-:nn <Leader>6 6gt
-:nn <Leader>7 7gt
-:nn <Leader>8 8gt
-:nn <Leader>9 8gt
-:nn <Leader>0 :tablast<CR>
+":nn <Leader>1 1gt
+":nn <Leader>2 2gt
+":nn <Leader>3 3gt
+":nn <Leader>4 4gt
+":nn <Leader>5 5gt
+":nn <Leader>6 6gt
+":nn <Leader>7 7gt
+":nn <Leader>8 8gt
+":nn <Leader>9 8gt
+":nn <Leader>0 :tablast<CR>
 
 " 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位） 
 set mouse=a 
 
-set clipboard+=unnamedplus
 " Find files using Telescope command-line sugar.
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
@@ -228,9 +230,6 @@ nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
 
-let g:indentLine_enabled = 1
-let g:indentLine_color_term = 239
-let g:indentLine_conceallevel = 2
 " rainbow 配置
 let g:rainbow_active = 1
 let g:rainbow_conf = {
@@ -255,15 +254,16 @@ let g:rainbow_conf = {
 \       'css': 0,
 \   }
 \}
-nnoremap <Leader>s :<C-u>call gitblame#echo()<CR>
+"nnoremap <Leader>s :<C-u>call gitblame#echo()<CR>
 
 " lightline
 let g:lightline = {
-\	'colorscheme': 'PaperColor',
+\	'colorscheme': 'one',
   \ 'active': {
   \   'left': [
   \     [ 'mode', 'paste' ],
-  \     [ 'ctrlpmark', 'git', 'diagnostic', 'cocstatus', 'filename', 'method' ],
+  \     ["absolutepath"],
+  \     [ 'ctrlpmark', 'git', 'diagnostic', 'cocstatus', 'method' ],
   \     ['gitbranch'],
   \     [ 'blame' ]
   \   ],
@@ -302,24 +302,9 @@ xmap ig <Plug>(coc-git-chunk-inner)
 omap ag <Plug>(coc-git-chunk-outer)
 xmap ag <Plug>(coc-git-chunk-outer)
 
-" 平滑滚动
-noremap <silent> <c-u> :call smooth_scroll#up(&scroll, 0, 2)<CR>
-noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
-noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
-noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
-
 " coc-explore
 :nmap <Leader>e <Cmd>CocCommand explorer<CR>
 
-" gotest
-let g:go_test_timeout = '100s'
-autocmd FileType go nmap <Leader>t  <Plug>(go-test-func)
-autocmd FileType go nmap <Leader>c <Plug>(go-coverage-toggle)
-let g:go_debug = ['shell-commands']
-let g:go_term_enabled = 'true'
-let g:go_term_mode = "vsplit"
-let g:go_term_height = 100
-let g:go_term_width = 100
 " 悬浮窗口
 nnoremap   <silent>   <F7>    :FloatermNew<CR>
 tnoremap   <silent>   <F7>    <C-\><C-n>:FloatermNew<CR>
@@ -332,6 +317,109 @@ tnoremap   <silent>   <F12>   <C-\><C-n>:FloatermToggle<CR>
 
 let g:floaterm_width = 0.8
 let g:floaterm_height = 0.8
+set clipboard+=unnamedplus
+
+
+"同步剪贴板
+function Copy()
+  let c = join(v:event.regcontents,"\n")
+  let c64 = system("base64", c)
+  let s = "\e]52;c;" . trim(c64) . "\x07"
+  call chansend(v:stderr, s)
+endfunction
+autocmd TextYankPost * call Copy()
+
+" Explorer
+let g:coc_explorer_global_presets = {
+\   '.vim': {
+\     'root-uri': '~/.vim',
+\   },
+\   'tab': {
+\     'position': 'tab',
+\     'quit-on-open': v:true,
+\   },
+\   'floating': {
+\     'position': 'floating',
+\     'open-action-strategy': 'sourceWindow',
+\   },
+\   'floatingTop': {
+\     'position': 'floating',
+\     'floating-position': 'center-top',
+\     'open-action-strategy': 'sourceWindow',
+\   },
+\   'floatingLeftside': {
+\     'position': 'floating',
+\     'floating-position': 'left-center',
+\     'floating-width': 50,
+\     'open-action-strategy': 'sourceWindow',
+\   },
+\   'floatingRightside': {
+\     'position': 'floating',
+\     'floating-position': 'right-center',
+\     'floating-width': 50,
+\     'open-action-strategy': 'sourceWindow',
+\   },
+\   'simplify': {
+\     'file-child-template': '[selection | clip | 1] [indent][icon | 1] [filename omitCenter 1]'
+\   }
+\ }
+
+" Use <C-l> for trigger snippet expand.
+imap <C-l> <Plug>(coc-snippets-expand)
+
+" Use <C-j> for select text for visual placeholder of snippet.
+vmap <C-j> <Plug>(coc-snippets-select)
+
+" Use <C-j> for jump to next placeholder, it's default of coc.nvim
+let g:coc_snippet_next = '<c-j>'
+
+" Use <C-k> for jump to previous placeholder, it's default of coc.nvim
+let g:coc_snippet_prev = '<c-k>'
+
+" Use <C-j> for both expand and jump (make expand higher priority.)
+imap <C-j> <Plug>(coc-snippets-expand-jump)
+
+" Use <leader>x for convert visual selected code to snippet
+xmap <leader>x  <Plug>(coc-convert-snippet)
+
+function! s:explorer_cur_dir()
+  let node_info = CocAction('runCommand', 'explorer.getNodeInfo', 0)
+  return fnamemodify(node_info['fullpath'], ':h')
+endfunction
+
+function! s:exec_cur_dir(cmd)
+  let dir = s:explorer_cur_dir()
+  execute 'cd ' . dir
+  execute a:cmd
+endfunction
+
+function! s:init_explorer()
+  set winblend=10
+
+  " Integration with other plugins
+
+  " CocList
+  nmap <buffer> <Leader>fg <Cmd>call <SID>exec_cur_dir('CocList -I grep')<CR>
+  nmap <buffer> <Leader>fG <Cmd>call <SID>exec_cur_dir('CocList -I grep -regex')<CR>
+  nmap <buffer> <C-p> <Cmd>call <SID>exec_cur_dir('CocList files')<CR>
+
+  " vim-floaterm
+  nmap <buffer> <Leader>ft <Cmd>call <SID>exec_cur_dir('FloatermNew --wintype=floating')<CR>
+endfunction
+
+function! s:enter_explorer()
+  if &filetype == 'coc-explorer'
+    " statusline
+    setl statusline=coc-explorer
+  endif
+endfunction
+
+augroup CocExplorerCustom
+  autocmd!
+  autocmd BufEnter * call <SID>enter_explorer()
+  autocmd FileType coc-explorer call <SID>init_explorer()
+augroup END
+
 else 
 set clipboard+=unnamedplus
 nnoremap <silent> ? :<C-u>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>
