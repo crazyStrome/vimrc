@@ -18,6 +18,8 @@ alacritty 是一个终端模拟器，可以开GPU加速，所以搭配 vim 非�
 cp alacritty.yml ~/.alacritty.yml
 ```
 
+当前配置中使用了 FiraCode Nerd Font 字体，需要安装该字体才能正常显示。[Installing · tonsky/FiraCode Wiki · GitHub](https://github.com/tonsky/FiraCode/wiki/Installing)
+
 然后 alacritty 就配置好了。
 
 ## neovim安装
@@ -102,11 +104,15 @@ curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs https://raw.githubuserc
 }
 ```
 
-当前 nvim 配置中使用了 coc-explorer，它需要使用 nerdfont 才能显示图标。
+当前 nvim 配置中使用了 coc-explorer，它需要使用 nerdfont 才能显示图标。这在前面的 alacritty 中有安装的方法，再贴一遍：[Installing · tonsky/FiraCode Wiki · GitHub](https://github.com/tonsky/FiraCode/wiki/Installing)
 
 到这里，nvim基本就可以用了。
 
-F9打开和关闭NerdTree。F10打开和关闭taglist。
+![neovim首页](./pic/overview.png)
+
+![float](./pic/float.png)
+
+其他快捷键：
 
 Ctrl+]代码跳转，Ctrl+o或t代码跳回。
 
