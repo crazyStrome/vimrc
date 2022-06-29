@@ -46,6 +46,8 @@ call plug#begin('~/.vim/plugged')
 Plug 'buoto/gotests-vim'
 Plug 'luochen1990/rainbow'
 Plug 'Yggdroot/indentLine'
+" 缩略图
+Plug 'wfxr/minimap.vim'
 " 显示 git 信息
 "Plug 'zivyangll/git-blame.vim'
 Plug 'mhinz/vim-startify'
@@ -177,10 +179,10 @@ colorscheme one
 "==============================================================================
 " vim-go 插件
 "==============================================================================
-let g:go_fmt_command = 'gofmt' "格式化将默认的 gofmt 替换
-let g:go_autodetect_gopath = 1
-let g:go_list_type = 'quickfix'
-
+"let g:go_fmt_command = 'gofmt' "格式化将默认的 gofmt 替换
+"let g:go_autodetect_gopath = 1
+"let g:go_list_type = 'quickfix'
+"
 let g:go_version_warning = 1
 let g:go_highlight_types = 1
 let g:go_highlight_fields = 1
@@ -190,8 +192,8 @@ let g:go_highlight_operators = 1
 let g:go_highlight_extra_types = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_generate_tags = 1
-
-let g:godef_split=2
+"
+"let g:godef_split=2
 
 "==============================================================================
 
@@ -419,6 +421,11 @@ augroup CocExplorerCustom
   autocmd BufEnter * call <SID>enter_explorer()
   autocmd FileType coc-explorer call <SID>init_explorer()
 augroup END
+
+" minimap 配置 
+let g:minimap_width = 10
+let g:minimap_auto_start = 1
+let g:minimap_auto_start_win_enter = 1
 
 else 
 set clipboard+=unnamedplus
