@@ -47,33 +47,28 @@ Plug 'buoto/gotests-vim'
 Plug 'luochen1990/rainbow'
 Plug 'Yggdroot/indentLine'
 " 缩略图
-Plug 'wfxr/minimap.vim'
+" Plug 'wfxr/minimap.vim'
 " 显示 git 信息
 "Plug 'zivyangll/git-blame.vim'
 Plug 'mhinz/vim-startify'
-Plug 'psliwka/vim-smoothie'
+"Plug 'psliwka/vim-smoothie'
 " 自动补全括号的插件，包括小括号，中括号，以及花括号
 Plug 'jiangmiao/auto-pairs'
-Plug 'itchyny/vim-gitbranch'
+"Plug 'itchyny/vim-gitbranch'
 " Vim状态栏插件，包括显示行号，列号，文件类型，文件名，以及Git状态
 " 配色方案
 " colorscheme one
-Plug 'haystackandroid/cosmic_latte'
 Plug 'rakr/vim-one'
 Plug 'itchyny/lightline.vim'
 " go 主要插件
-Plug 'fatih/vim-go', { 'tag': '*' }
-Plug 'lambdalisue/nerdfont.vim'
+" Plug 'fatih/vim-go', { 'tag': '*' }
 Plug 'glepnir/zephyr-nvim'
 " markdown 插件
-Plug 'iamcco/mathjax-support-for-mkdp'
-Plug 'iamcco/markdown-preview.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'NLKNguyen/papercolor-theme'
-Plug 'kyazdani42/nvim-web-devicons' " for file icons
 " 悬浮终端
 Plug 'voldikss/vim-floaterm'
 Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-telescope/telescope.nvim'
 call plug#end()
 
@@ -100,20 +95,20 @@ set shortmess+=c
 set signcolumn=yes
 
 " Use tab for trigger completion with characters ahead and navigate.
-" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+" NOTE: There's always complete item selected by default, you may want to enable
+" no select by `"suggest.noselect": true` in your configuration file.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
 inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-" Make <CR> auto-select the first completion item and notify coc.nvim to
-" format on enter, <cr> could be remapped by other vim plugin
-inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
+" Make <CR> to accept selected completion item or notify coc.nvim to format
+" <C-g>u breaks current undo, please make your own choice.
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
                               \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
 
 " Remap keys for gotos
 nmap <silent> gd <Plug>(coc-definition)
@@ -148,7 +143,7 @@ augroup mygroup
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
-autocmd BufWritePre *.go :call CocAction('runCommand', 'editor.action.organizeImport')
+autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
 
 " Use `:Format` to format current buffer
 command! -nargs=0 Format :call CocAction('format')
@@ -183,15 +178,15 @@ colorscheme one
 "let g:go_autodetect_gopath = 1
 "let g:go_list_type = 'quickfix'
 "
-let g:go_version_warning = 1
-let g:go_highlight_types = 1
-let g:go_highlight_fields = 1
-let g:go_highlight_functions = 1
-let g:go_highlight_function_calls = 1
-let g:go_highlight_operators = 1
-let g:go_highlight_extra_types = 1
-let g:go_highlight_methods = 1
-let g:go_highlight_generate_tags = 1
+"let g:go_version_warning = 1
+"let g:go_highlight_types = 1
+"let g:go_highlight_fields = 1
+"let g:go_highlight_functions = 1
+"let g:go_highlight_function_calls = 1
+"let g:go_highlight_operators = 1
+"let g:go_highlight_extra_types = 1
+"let g:go_highlight_methods = 1
+"let g:go_highlight_generate_tags = 1
 "
 "let g:godef_split=2
 
@@ -217,8 +212,8 @@ let g:go_highlight_generate_tags = 1
 ":nn <Leader>9 8gt
 ":nn <Leader>0 :tablast<CR>
 
-" 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位） 
-set mouse=a 
+" 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位）
+set mouse=a
 
 " Find files using Telescope command-line sugar.
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
@@ -260,11 +255,11 @@ let g:rainbow_conf = {
 
 " lightline
 let g:lightline = {
-\	'colorscheme': 'one',
+\       'colorscheme': 'one',
   \ 'active': {
   \   'left': [
   \     [ 'mode', 'paste' ],
-  \     ["absolutepath"],
+  \     ['relativepath', 'filename'],
   \     [ 'ctrlpmark', 'git', 'diagnostic', 'cocstatus', 'method' ],
   \     ['gitbranch'],
   \     [ 'blame' ]
@@ -277,7 +272,20 @@ let g:lightline = {
   \   'blame': 'LightlineGitBlame',
   "\   'gitbranch': 'gitbranch#name'
   \   'gitbranch': 'LightlineGitStatue'
-  \ }
+  \ },
+\ 'mode_map': {
+        \ 'n' : 'N',
+        \ 'i' : 'I',
+        \ 'R' : 'R',
+        \ 'v' : 'V',
+        \ 'V' : 'VL',
+        \ "\<C-v>": 'VB',
+        \ 'c' : 'C',
+        \ 's' : 'S',
+        \ 'S' : 'SL',
+        \ "\<C-s>": 'SB',
+        \ 't': 'T',
+        \ }
 \ }
 function! LightlineGitBlame() abort
   let blame = get(b:, 'coc_git_blame', 'no blame msg')
@@ -317,8 +325,8 @@ tnoremap   <silent>   <F9>    <C-\><C-n>:FloatermNext<CR>
 nnoremap   <silent>   <F12>   :FloatermToggle<CR>
 tnoremap   <silent>   <F12>   <C-\><C-n>:FloatermToggle<CR>
 
-let g:floaterm_width = 0.8
-let g:floaterm_height = 0.8
+let g:floaterm_width = 1.0
+let g:floaterm_height = 1.0
 set clipboard+=unnamedplus
 
 
@@ -422,12 +430,12 @@ augroup CocExplorerCustom
   autocmd FileType coc-explorer call <SID>init_explorer()
 augroup END
 
-" minimap 配置 
+" minimap 配置
 let g:minimap_width = 10
 let g:minimap_auto_start = 1
 let g:minimap_auto_start_win_enter = 1
 
-else 
+else
 set clipboard+=unnamedplus
 nnoremap <silent> ? :<C-u>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>
 xmap gc  <Plug>VSCodeCommentary
